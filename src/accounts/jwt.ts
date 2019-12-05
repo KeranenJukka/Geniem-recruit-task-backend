@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 
-const HOUR = 3600;
+const HOUR = 5;
 const SECRET = process.env.JWT_SIGNING_SECRET;
 
 const getSecondsNow = (): number => Math.floor(new Date().getTime() / 1000);
@@ -30,4 +30,3 @@ export const issueToken = (sub: number | string, validFor: number = HOUR) => {
 export const validateToken = (token: string) => {
   return jwt.verify(token, SECRET);
 };
-

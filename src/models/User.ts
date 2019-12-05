@@ -16,7 +16,7 @@ export default class User extends Model {
     properties: {
       id: { type: 'integer' },
       firstname: { type: 'string', minLength: 1, maxLength: 255 },
-      lastname: { type: 'string', minLength: 1, maxLength: 255 },
+      lastname: { type: 'string', minLength: 0, maxLength: 255 },
       password: { type: 'string', minLength: 1, maxLength: 255 },
 
     },
