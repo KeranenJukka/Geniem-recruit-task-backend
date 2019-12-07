@@ -14,14 +14,92 @@ export default (router: express.Router) => {
 
 /* -------- CORS- ----------*/
 
-  router.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // update to match the domain you will make the request from
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  });
+router.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
-  router.use(express.json())
- 
+router.use(express.json())
+  
+
+/* -------- Get user and id from token - ----------*/
+
+  const getIdandUser = async (arg: string) => {
+  
+    return new Promise((resolve, reject) => {
+      
+      var token = validateToken(arg);
+      token = JSON.parse(token["sub"])
+    
+      return resolve(token);
+
+    })
+    .catch(( ) => {
+      console.log("error")
+    })
+
+  
+  }  
+
+
+
+/* -------- Login ----------*/
+
+router.post('/login', async function (req, res) {
+    
+var pass = req.body.password;
+
+await User.query().where("username", req.body.username)
+.then(resp => {
+
+    if (resp.length === 0) {
+      res.send("no")
+      return null
+    }
+    
+    var pass = req.body.password;
+    var hash = resp[0]["password"];
+    
+  
+    comparePassword(pass, hash)
+    .then(response => {
+      
+      if (response === false) {
+        res.send(response)
+      }
+
+      else if (response === true) {
+
+        var info = {
+          username: resp[0]["username"],
+          id: resp[0]["id"]
+        };
+
+        var token = JSON.stringify(info)
+        
+        token = issueToken(token);
+        
+        res.send({
+          res: "success",
+          token: token,
+          user: resp[0]["firstname"] + " " + resp[0]["lastname"]
+        })
+
+      }
+
+    })
+    
+
+
+    
+})
+.catch(err => {console.log(err)})
+
+  
+})
+
+
 
 /* -------- Check username ----------*/
 
@@ -29,7 +107,7 @@ router.post('/checkuser', async function (req, res) {
     
   
 
-  const check = await User.query().where("username", req.body.username)
+  await User.query().where("username", req.body.username)
   .then((response) => {
 
     if (response.length === 0) {
@@ -48,25 +126,42 @@ router.post('/checkuser', async function (req, res) {
 
 router.post('/adduser', async (req, res) => {
      
-  var info = {...req.body}
+var info = {...req.body}
 
-  
-
+//add function  
 var add = async (theinfo: object) => {
 
-  const insert = await User.query().insert(theinfo)
+  await User.query().insert(theinfo)
   .catch(() => {
     
   })
 
-  .then(() => {
+  .then(async () => {
 
-    var token = issueToken(req.body.username);
+    //check id
+    await User.query().where("username", info.username)
+    .then((response) => {
+  
+    var id = response[0].id;
+      
+    // get token
+
+    var info = {
+      username: req.body.username,
+      id: id
+    };
+
+    var token = JSON.stringify(info)
     
-
+    token = issueToken(token);
+    
     res.send({
       res: "success",
-      token: token
+      token: token,
+      user: req.body.firstname + " " + req.body.lastname
+    })
+      
+  
     })
  
   })
@@ -81,6 +176,7 @@ hashPassword(req.body.password)
     
     info.password = res.hash;
 
+    // use function
     add(info)
     
   })
@@ -88,19 +184,31 @@ hashPassword(req.body.password)
   
 })
 
-/* -------- Get user posts ----------*/
 
+
+/* -------- Get user posts ----------*/
 
 router.post('/getposts', async (req, res) => {
 
-  
-  const checkposts = await Todo.query().where("userId", req.body.id)
-  .then((response) => {
+  getIdandUser(req.body.token)
+  .then(async (info) => {
 
-    res.send(response)
+    await Todo.query().where("userId", info["id"])
+    .then((response) => {
+  
+      res.send(response)
+  
+    })
+    .catch(() => {
+
+    })
 
   })
+  .catch(() => {
+    res.send("error")
+  })
 
+  
 });
 
 /* -------- Add post ----------*/
@@ -108,19 +216,32 @@ router.post('/getposts', async (req, res) => {
 
 router.post('/addpost', async (req, res) => {
 
-var post = req.body;
+  getIdandUser(req.body.token)
+  .then(async (info) => {
 
-  
-  const ins = await Todo.query().insert(post)
-    .then(()=>{
-      res.send("success")
+    var post = {
+      title: "post",
+      description: req.body.description,
+      userId: info["id"],
+      checkbox: "no"
+     }
+
+     
+      await Todo.query().insert(post)
+      .then(()=>{
+        res.send("success")
+      })
+      .catch(() => {
+        
+      })
+
+
     })
     .catch(() => {
-      
+      res.send("error")
     })
 
-
-});
+  })
 
 
 /* -------- Delete post ----------*/
@@ -128,14 +249,25 @@ var post = req.body;
 
 router.post('/deletepost', async (req, res) => {
 
-  var post = req.body.id;
-  var user = req.body.userId
+  getIdandUser(req.body.token)
+  .then(async (info) => {
 
-  const numberOfDeletedRows = await Todo.query()
-  .delete()
-  .where("id", post)
-  .then((response) => {
-    res.send("success")
+    var post = req.body.id;
+
+    await Todo.query()
+    .where("id", post)
+    .where("userId", info["id"])
+    .delete()
+    .then(() => {
+      res.send("success")
+    })
+    .catch(() => {
+      res.send("error")
+    })
+
+  })
+  .catch(() => {
+    res.send("error")
   })
 
  
@@ -147,18 +279,32 @@ router.post('/deletepost', async (req, res) => {
 
 router.post('/changepost', async (req, res) => {
 
-  var id = req.body.id;
-  var user = req.body.userId;
-  var text = req.body.text;
 
-  if (text.length === 0) {text = " "}
+  getIdandUser(req.body.token)
+  .then(async (info) => {
 
-  const update = await Todo.query().patchAndFetchById(id, { description: text })
-  .then(() => {
+    var post = req.body.id;
 
-    res.send("success")
+    await Todo.query()
+    .where("id", post)
+    .where("userId", info["id"])
+    .patch({description: req.body.text})
+    .then((response) => {
+      console.log(response)
+      res.send("success")
+    })
+    .catch((err) => {
+      console.log(err)
+      res.send("error")
+    })
 
+
+   })
+  .catch((err) => {
+    console.log(err)
+    res.send("error")
   })
+
 
  
   });
@@ -171,7 +317,7 @@ router.post('/todos', async function (req, res) {
     
   console.log(req.body)
 
-  const insert = await Todo.query().insert(req.body)
+  await Todo.query().insert(req.body)
   .catch((err) => {});
  
   res.send('POST request to the homepage')
@@ -184,9 +330,13 @@ router.post('/todos', async function (req, res) {
   });
 
 
-
-
 };
+
+hashPassword("moimoi")
+
+.then((pass) => {
+
+var password = pass.hash
 
 
 
@@ -197,7 +347,7 @@ setTimeout(() => {
     username: "kerde",
     firstname: "jukka",
     lastname: "keränen",
-    password: "moimoi"
+    password: password
   
   }
   
@@ -217,7 +367,7 @@ setTimeout(() => {
     username: "kerdeman",
     firstname: "meikä",
     lastname: "keränen",
-    password: "moimoifd"
+    password: "jotain"
   
   }
   
@@ -302,6 +452,7 @@ jes5()
 
 }, 5000);
 
+})
 
 
 /*

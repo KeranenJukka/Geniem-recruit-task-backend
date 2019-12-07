@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 
-const HOUR = 5;
+const HOUR = 3600;
 const SECRET = process.env.JWT_SIGNING_SECRET;
 
 const getSecondsNow = (): number => Math.floor(new Date().getTime() / 1000);
