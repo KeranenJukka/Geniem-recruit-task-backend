@@ -88,6 +88,81 @@ hashPassword(req.body.password)
   
 })
 
+/* -------- Get user posts ----------*/
+
+
+router.post('/getposts', async (req, res) => {
+
+  
+  const checkposts = await Todo.query().where("userId", req.body.id)
+  .then((response) => {
+
+    res.send(response)
+
+  })
+
+});
+
+/* -------- Add post ----------*/
+
+
+router.post('/addpost', async (req, res) => {
+
+var post = req.body;
+
+  
+  const ins = await Todo.query().insert(post)
+    .then(()=>{
+      res.send("success")
+    })
+    .catch(() => {
+      
+    })
+
+
+});
+
+
+/* -------- Delete post ----------*/
+
+
+router.post('/deletepost', async (req, res) => {
+
+  var post = req.body.id;
+  var user = req.body.userId
+
+  const numberOfDeletedRows = await Todo.query()
+  .delete()
+  .where("id", post)
+  .then((response) => {
+    res.send("success")
+  })
+
+ 
+  });
+
+
+  /* -------- Change post ----------*/
+
+
+router.post('/changepost', async (req, res) => {
+
+  var id = req.body.id;
+  var user = req.body.userId;
+  var text = req.body.text;
+
+  if (text.length === 0) {text = " "}
+
+  const update = await Todo.query().patchAndFetchById(id, { description: text })
+  .then(() => {
+
+    res.send("success")
+
+  })
+
+ 
+  });
+
 
 /* -------- SOMETHING ----------*/
 
@@ -103,28 +178,11 @@ router.post('/todos', async function (req, res) {
 })
 
 
-
-
-
   router.get('/users', async (req, res) => {
     const users = await User.query();
     res.send(users);
   });
 
-  router.get('/todos', async (req, res) => {
-    const todos = await Todo.query();
-    res.send(todos);
-  });
-
-
-  router.get('/todos/:id', async (req, res) => {
-    const id = req.query.id;
-    if (!id || Number.isInteger(id)) throw new BadRequestError('Invalid TodoID!');
-
-    const todo = await Todo.query().where({ id }).first();
-    if (!todo) throw new NotFoundError('No such Todo!');
-    return todo;
-  });
 
 
 
@@ -185,6 +243,7 @@ setTimeout(() => {
     title: "post",
     description: "tekstiä",
     userId: 1,
+    checkbox: "no"
       
   }
   
@@ -204,6 +263,7 @@ var n4 = {
   title: "postia",
   description: "tekssdfdftiä",
   userId: 2,
+  checkbox: "no"
     
 }
 
@@ -219,5 +279,41 @@ async function jes4 () {
 jes4()
 
 
+var n5 = {
+
+  title: "postifasda",
+  description: "tekssdffdftiä",
+  userId: 1,
+  checkbox: "no"
+    
+}
+
+async function jes5 () {
+  console.log("lisätään tekstiä!")
+  const ins = await Todo.query().insert(n5)
+  .catch((err) => {
+    console.log(err)
+  })
+
+}
+
+jes5()
+
+
 }, 5000);
 
+
+
+/*
+
+router.get('/todos/:id', async (req, res) => {
+  console.log(req.query)
+  const id = req.query.id;
+  if (!id || Number.isInteger(id)) throw new BadRequestError('Invalid TodoID!');
+
+  const todo = await Todo.query().where({ id }).first();
+  if (!todo) throw new NotFoundError('No such Todo!');
+  return todo;
+});
+
+*/

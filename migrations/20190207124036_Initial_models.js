@@ -16,6 +16,7 @@ exports.up = knex => {
       table.increments('id').primary();
       table.string('title').notNullable();
       table.string('description');
+      table.string('checkbox');
 
       table.bigInteger('createdAt').notNullable().defaultTo(knex.fn.now());
       table.bigInteger('updatedAt').notNullable().defaultTo(knex.fn.now());

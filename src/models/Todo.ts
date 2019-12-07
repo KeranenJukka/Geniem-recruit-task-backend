@@ -18,6 +18,7 @@ export default class Todo extends Model {
       id: { type: 'integer' },
       title: { type: 'string', minLength: 1, maxLength: 255 },
       description: { type: 'string', minLength: 1, maxLength: 255 },
+      checkbox: { type: 'string', minLength: 1, maxLength: 255 },
       userId: { type: ['integer', 'null'] },
     },
   };
