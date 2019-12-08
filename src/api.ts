@@ -305,7 +305,6 @@ router.post('/changepost', async (req, res) => {
     res.send("error")
   })
 
-
  
   });
 
@@ -327,6 +326,11 @@ router.post('/todos', async function (req, res) {
   router.get('/users', async (req, res) => {
     const users = await User.query();
     res.send(users);
+  });
+
+  router.get('/todos', async (req, res) => {
+    const todos = await Todo.query();
+    res.send(todos);
   });
 
 
