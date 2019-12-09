@@ -52,12 +52,10 @@
     "tsc-watch": "^1.1.36",
     "tslint": "^5.12.1",
     "tslint-config-airbnb": "^5.11.1",
-    "typescript": "^2.7.1"
+    "typescript": "^2.9.2"
   },
-
   "engines": {
     "node": "12.13.1",
     "npm": "6.12.1"
   }
-
 }
