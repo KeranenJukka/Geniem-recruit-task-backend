@@ -53,5 +53,11 @@
     "tslint": "^5.12.1",
     "tslint-config-airbnb": "^5.11.1",
     "typescript": "^2.7.1"
+  },
+
+  "engines": {
+    "node": "12.13.1",
+    "npm": "6.12.1"
   }
+
 }
