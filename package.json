@@ -35,7 +35,7 @@
     "morgan": "^1.9.0",
     "objection": "^1.4.0",
     "sqlite3": "^4.1.1",
-    "tsc-watch": "^1.1.36"
+    "typescript": "^2.9.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
