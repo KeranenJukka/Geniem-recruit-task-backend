@@ -24,6 +24,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@types/node": "^12.12.15",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
     "dotenv": "^6.2.0",
@@ -35,8 +36,7 @@
     "morgan": "^1.9.0",
     "objection": "^1.4.0",
     "sqlite3": "^4.1.1",
-    "typescript": "^2.9.2",
-    "tsc-watch": "^1.1.36"
+    "typescript": "^2.9.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
