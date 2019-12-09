@@ -47,7 +47,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   }
 });
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log('Todo app listening at port %s', port);
 });

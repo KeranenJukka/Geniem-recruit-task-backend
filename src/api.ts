@@ -7,10 +7,11 @@ import {issueToken, validateToken} from './accounts/jwt';
 import {hashPassword, comparePassword} from './accounts/password';
 
 
+
+
 export default (router: express.Router) => {
 
-process.env.PORT || 8080;
-
+  
 
 /*-------------- Serve the site ------------------*/
 
